@@ -8,7 +8,7 @@ const storage = multer.diskStorage({
     cb(null, "./public/logos"); // Папка для хранения логотипов
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname); // Генерация уникального имени
+    cb(null, file.originalname); // Генерация уникального имени
   },
 });
 

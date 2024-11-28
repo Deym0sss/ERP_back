@@ -4,6 +4,8 @@ const user = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   phone: { type: String, required: true },
+  name: { type: String, required: true },
+  surname: { type: String, required: true },
   locationIds: [{ type: Schema.Types.ObjectId, ref: "Location" }],
   role: { type: String, required: true },
 });

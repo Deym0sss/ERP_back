@@ -12,4 +12,4 @@ const location = new Schema({
   logo: { type: String },
 });
 
-module.exports = model("Locaiton", location);
+module.exports = model("Location", location);

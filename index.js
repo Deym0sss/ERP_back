@@ -14,10 +14,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/logos", express.static("public/logos"));
 app.use("/images", express.static("public/images"));
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/location", require("./routes/locationRoutes"));
-app.use("/api/asset", require("./routes/assetRoutes"));
-app.use("/api/order", require("./routes/orderRoutes"));
+app.use("/auth", require("./routes/authRoutes"));
+app.use("/location", require("./routes/locationRoutes"));
+app.use("/asset", require("./routes/assetRoutes"));
+app.use("/order", require("./routes/orderRoutes"));
 
 async function start() {
   try {

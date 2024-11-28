@@ -5,10 +5,10 @@ const AssetController = require("../controllers/assetController");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./public/images"); // Папка для хранения логотипов
+    cb(null, "./public/images");
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname); // Генерация уникального имени
+    cb(null, file.originalname);
   },
 });
 

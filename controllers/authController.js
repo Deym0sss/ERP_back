@@ -2,8 +2,34 @@ const { validationResult } = require("express-validator");
 const userModel = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 class AuthController {
+  async getUserByUserId(req, res) {
+    try {
+      const { userId } = req.params;
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: "User with this id doesn`t exist" });
+      }
+
+      res.status(200).json(user);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "error", error });
+    }
+  }
+  async getUsers(req, res) {
+    try {
+      const users = await userModel.find();
+      res.status(200).json(users);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "error", error });
+    }
+  }
   async getAllByLocationId(req, res) {
     try {
       const locationId = req.params.locationId;
@@ -41,7 +67,7 @@ class AuthController {
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { email, password, phone, locationIds } = req.body;
+      const { email, password, phone, name, surname } = req.body;
       const candidate = await userModel.findOne({ email });
       if (candidate) {
         return res.status(400).json({ message: "User already exist." });
@@ -51,8 +77,10 @@ class AuthController {
         email,
         password: hashedPassword,
         phone,
-        locationIds,
-        role: "client",
+        name,
+        surname,
+        locationIds: [],
+        role: "Staff",
       });
       await user.save();
       res.status(201).json({ message: "User created." });
@@ -84,7 +112,12 @@ class AuthController {
         expiresIn: "1h",
       });
 
-      res.json({ token, userId: user.id });
+      res.json({
+        token,
+        userId: user.id,
+        name: user.name,
+        surname: user.surname,
+      });
     } catch (error) {
       res.status(500).json({ message: "Some error." });
     }
@@ -96,7 +129,13 @@ class AuthController {
       if (req.body.email) updateData.email = req.body.email;
       if (req.body.password) updateData.password = req.body.password;
       if (req.body.phone) updateData.phone = req.body.phone;
-      if (req.body.locationIds) updateData.locationIds = req.body.locationIds;
+      if (req.body.locationIds) {
+        const locationIds = req.body.locationIds.map(
+          (id) => new mongoose.Types.ObjectId(id)
+        );
+        updateData.$addToSet = { locationIds: { $each: locationIds } };
+      }
+
       if (req.body.role) updateData.role = req.body.role;
 
       if (Object.keys(updateData).length === 0) {
@@ -112,9 +151,39 @@ class AuthController {
       }
       res.status(200).json({ message: "User updated", updatedUser });
     } catch (error) {
+      console.error("Error updating user:", error);
       res.status(500).json({ message: "error", error });
     }
   }
+
+  async removeLocation(req, res) {
+    try {
+      const { userId, locationId } = req.body; // Получаем locationId, который нужно удалить, из тела запроса
+      console.log(userId);
+      // Проверяем, что locationId передан в запросе
+      if (!locationId) {
+        return res.status(400).json({ message: "locationId is required" });
+      }
+
+      // Используем $pull для удаления locationId из массива locationIds
+      const updatedUser = await userModel.findByIdAndUpdate(
+        userId,
+        { $pull: { locationIds: new mongoose.Types.ObjectId(locationId) } }, // Исправлено: создаем новый ObjectId
+        { new: true } // Возвращаем обновленного пользователя
+      );
+      // Если пользователь не найден, возвращаем ошибку
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Возвращаем успешный ответ с обновленными данными
+      res.status(200).json({ message: "Location removed", updatedUser });
+    } catch (error) {
+      console.error("Error removing location:", error);
+      res.status(500).json({ message: "Error", error });
+    }
+  }
+
   async delete(req, res) {
     try {
       const { userId } = req.params;
@@ -125,6 +194,19 @@ class AuthController {
       }
 
       res.status(200).json({ message: `deleted user ${user.email}` });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Some error occurred." });
+    }
+  }
+  async findByEmail(req, res) {
+    try {
+      const { email } = req.body;
+      const user = await userModel.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(200).json({ userId: user._id });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Some error occurred." });

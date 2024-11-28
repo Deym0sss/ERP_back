@@ -68,7 +68,7 @@ class LocationController {
         logo,
       });
       await location.save();
-      res.status(200).json({ message: "Location Added" });
+      res.status(200).json({ message: "Location Added", location });
     } catch (error) {
       res.status(500).json({ message: error });
     }

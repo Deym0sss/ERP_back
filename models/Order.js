@@ -2,7 +2,6 @@ const { Schema, model } = require("mongoose");
 
 const order = new Schema({
   title: { type: String, required: true },
-  type: { type: String, required: true },
   status: { type: String, required: true },
   paymentStatus: { type: String, required: true },
   createdAt: { type: Date, required: true },
