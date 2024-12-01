@@ -23,6 +23,7 @@ router.get("/ids/:assetIds", AssetController.getByIds);
 router.get("/all/:locationId", AssetController.getAllByLocationId);
 router.post("/create", AssetController.create);
 router.put("/edit/:assetId", AssetController.update);
+router.put("/inventory", AssetController.inventory);
 router.delete("/:assetId", AssetController.delete);
 
 module.exports = router;

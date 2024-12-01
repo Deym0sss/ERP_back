@@ -22,6 +22,8 @@ router.post("/uploadLogo", upload.single("logo"), (req, res) => {
 router.get("/ids/:locationIds", LocationController.getByIds);
 router.get("/all", LocationController.getAll);
 router.post("/create", LocationController.create);
+router.put("/removeAsset", LocationController.removeAsset);
+router.put("/removeOrder", LocationController.removeOrder);
 router.put("/edit/:locationId", LocationController.update);
 router.delete("/:locationId", LocationController.delete);
 

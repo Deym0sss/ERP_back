@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const locationModel = require("../models/Location");
 
 class LocationController {
@@ -84,8 +85,16 @@ class LocationController {
       if (req.body.staff) updateData.staff = req.body.staff;
       if (req.body.city) updateData.city = req.body.city;
       if (req.body.country) updateData.country = req.body.country;
-      if (req.body.orders) updateData.orders = req.body.orders;
-      if (req.body.assets) updateData.assets = req.body.assets;
+      if (req.body.orders) {
+        const orders = req.body.orders;
+        new mongoose.Types.ObjectId(orders);
+        updateData.$addToSet = { orders: orders };
+      }
+      if (req.body.assets) {
+        const assets = req.body.assets;
+        new mongoose.Types.ObjectId(assets);
+        updateData.$addToSet = { assets: assets };
+      }
       if (req.body.logo) updateData.logo = req.body.logo;
 
       if (Object.keys(updateData).length === 0) {
@@ -102,6 +111,41 @@ class LocationController {
       res.status(200).json({ message: "Location updated", updatedLocation });
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  }
+
+  async removeAsset(req, res) {
+    try {
+      const { assetId, locationId } = req.body;
+      const updatedLocation = await locationModel.findByIdAndUpdate(
+        locationId,
+        { $pull: { assets: new mongoose.Types.ObjectId(assetId) } },
+        { new: true }
+      );
+      if (!updatedLocation) {
+        return res.status(404).json({ message: "location not found" });
+      }
+      res.status(200).json({ message: "Location removed", updatedLocation });
+    } catch (error) {
+      console.error("Error removing location:", error);
+      res.status(500).json({ message: "Error", error });
+    }
+  }
+  async removeOrder(req, res) {
+    try {
+      const { orderId, locationId } = req.body;
+      const updatedLocation = await locationModel.findByIdAndUpdate(
+        locationId,
+        { $pull: { orders: new mongoose.Types.ObjectId(orderId) } },
+        { new: true }
+      );
+      if (!updatedLocation) {
+        return res.status(404).json({ message: "location not found" });
+      }
+      res.status(200).json({ message: "Location removed", updatedLocation });
+    } catch (error) {
+      console.error("Error removing location:", error);
+      res.status(500).json({ message: "Error", error });
     }
   }
 

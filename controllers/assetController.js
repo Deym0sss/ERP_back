@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const assetModel = require("../models/Asset");
 
 class AssetController {
@@ -21,7 +22,6 @@ class AssetController {
   async getAllByLocationId(req, res) {
     try {
       const locationId = req.params.locationId;
-      console.log(locationId);
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
       const skip = (page - 1) * limit;
@@ -50,8 +50,7 @@ class AssetController {
 
   async create(req, res) {
     try {
-      const { title, description, tag, value, location, image, cost } =
-        req.body;
+      const { title, description, tag, value, location, img, cost } = req.body;
 
       const asset = new assetModel({
         title,
@@ -59,11 +58,11 @@ class AssetController {
         tag,
         value,
         location,
-        image,
+        img,
         cost,
       });
       await asset.save();
-      res.status(200).json({ message: "Asset Added" });
+      res.status(200).json(asset);
     } catch (error) {
       res.status(500).json({ message: error });
     }
@@ -78,6 +77,7 @@ class AssetController {
       if (req.body.tag) updateData.tag = req.body.tag;
       if (req.body.value) updateData.value = req.body.value;
       if (req.body.location) updateData.location = req.body.location;
+
       if (req.body.image) updateData.image = req.body.image;
       if (req.body.cost) updateData.cost = req.body.cost;
 
@@ -98,6 +98,20 @@ class AssetController {
       res.status(200).json({ message: "Asset updated", updatedAsset });
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  }
+
+  async inventory(req, res) {
+    try {
+      const assetsToUpdate = req.body;
+      for (const { assetId, value } of assetsToUpdate) {
+        await assetModel.findByIdAndUpdate(assetId, { value });
+      }
+
+      res.status(200).json({ message: "Assets updated successfully" });
+    } catch (error) {
+      console.error("Error updating assets:", error);
+      res.status(500).json({ message: "Failed to update assets" });
     }
   }
 

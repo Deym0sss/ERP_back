@@ -49,6 +49,8 @@ class OrderController {
 
   async create(req, res) {
     try {
+      console.log(req.body);
+
       const {
         title,
         type,
@@ -69,8 +71,9 @@ class OrderController {
         assets,
       });
       await order.save();
-      res.status(200).json({ message: "Order Added" });
+      res.status(200).json({ message: "Order Added", order });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ message: error });
     }
   }

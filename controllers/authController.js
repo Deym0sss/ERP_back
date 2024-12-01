@@ -158,25 +158,19 @@ class AuthController {
 
   async removeLocation(req, res) {
     try {
-      const { userId, locationId } = req.body; // Получаем locationId, который нужно удалить, из тела запроса
-      console.log(userId);
-      // Проверяем, что locationId передан в запросе
+      const { userId, locationId } = req.body;
       if (!locationId) {
         return res.status(400).json({ message: "locationId is required" });
       }
-
-      // Используем $pull для удаления locationId из массива locationIds
       const updatedUser = await userModel.findByIdAndUpdate(
         userId,
-        { $pull: { locationIds: new mongoose.Types.ObjectId(locationId) } }, // Исправлено: создаем новый ObjectId
-        { new: true } // Возвращаем обновленного пользователя
+        { $pull: { locationIds: new mongoose.Types.ObjectId(locationId) } },
+        { new: true }
       );
-      // Если пользователь не найден, возвращаем ошибку
+
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
-
-      // Возвращаем успешный ответ с обновленными данными
       res.status(200).json({ message: "Location removed", updatedUser });
     } catch (error) {
       console.error("Error removing location:", error);
