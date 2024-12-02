@@ -67,35 +67,57 @@ class AssetController {
       res.status(500).json({ message: error });
     }
   }
+  // Метод для обновления ассетов
+  async updateAssets(req, res) {
+    try {
+      const { assets } = req.body;
+      console.log(assets);
+
+      if (!assets || !Array.isArray(assets)) {
+        return res.status(400).json({ message: "Invalid assets data" });
+      }
+
+      for (const asset of assets) {
+        await assetModel.findByIdAndUpdate(asset.key, { value: asset.value });
+      }
+
+      res.status(200).json({ message: "Assets updated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  // Основной метод обновления заказа
   async update(req, res) {
     try {
-      const { assetId } = req.params; // ID актива передается в параметре запроса
+      const { orderId } = req.params;
       const updateData = {};
-      // Проверяем, какие поля были переданы в теле запроса, и добавляем их в объект обновления
-      if (req.body.title) updateData.title = req.body.title;
-      if (req.body.description) updateData.description = req.body.description;
-      if (req.body.tag) updateData.tag = req.body.tag;
-      if (req.body.value) updateData.value = req.body.value;
-      if (req.body.location) updateData.location = req.body.location;
 
-      if (req.body.image) updateData.image = req.body.image;
-      if (req.body.cost) updateData.cost = req.body.cost;
+      if (req.body.title) updateData.title = req.body.title;
+      if (req.body.type) updateData.type = req.body.type;
+      if (req.body.status) updateData.status = req.body.status;
+      if (req.body.paymentStatus)
+        updateData.paymentStatus = req.body.paymentStatus;
+      if (req.body.createdAt) updateData.createdAt = req.body.createdAt;
+      if (req.body.location) updateData.location = req.body.location;
 
       if (Object.keys(updateData).length === 0) {
         return res.status(400).json({ message: "No data to update" });
       }
 
-      const updatedAsset = await assetModel.findByIdAndUpdate(
-        assetId,
+      const updatedOrder = await orderModel.findByIdAndUpdate(
+        orderId,
         updateData,
-        { new: true }
+        {
+          new: true,
+        }
       );
 
-      if (!updatedAsset) {
-        return res.status(404).json({ message: "Asset not found" });
+      if (!updatedOrder) {
+        return res.status(404).json({ message: "Order not found" });
       }
 
-      res.status(200).json({ message: "Asset updated", updatedAsset });
+      res.status(200).json({ message: "Order updated", updatedOrder });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
