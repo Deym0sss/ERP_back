@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post("/uploadImage", upload.single("img"), (req, res) => {
-  const imgUrl = `/images/${req.file.filename}`; // Формирование пути к файлу
+  const imgUrl = `/images/${req.file.filename}`;
   res.status(200).json({ message: "Image uploaded", imgUrl });
 });
 

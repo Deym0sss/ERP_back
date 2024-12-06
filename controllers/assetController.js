@@ -67,7 +67,7 @@ class AssetController {
       res.status(500).json({ message: error });
     }
   }
-  // Метод для обновления ассетов
+
   async updateAssets(req, res) {
     try {
       const { assets } = req.body;
@@ -87,7 +87,6 @@ class AssetController {
     }
   }
 
-  // Основной метод обновления заказа
   async update(req, res) {
     try {
       const { orderId } = req.params;

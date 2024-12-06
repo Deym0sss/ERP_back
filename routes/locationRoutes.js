@@ -5,17 +5,17 @@ const LocationController = require("../controllers/locationController");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./public/logos"); // Папка для хранения логотипов
+    cb(null, "./public/logos");
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname); // Генерация уникального имени
+    cb(null, file.originalname);
   },
 });
 
 const upload = multer({ storage });
 
 router.post("/uploadLogo", upload.single("logo"), (req, res) => {
-  const logoUrl = `/logos/${req.file.filename}`; // Формирование пути к файлу
+  const logoUrl = `/logos/${req.file.filename}`;
   res.status(200).json({ message: "Logo uploaded", logoUrl });
 });
 
